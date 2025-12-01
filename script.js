@@ -41,12 +41,14 @@ function initializeApp() {
         
         // Get work times (checkboxes) with validation
         const workTimes = [];
+        const selectedTimeIds = [];
         const workTimeCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
         workTimeCheckboxes.forEach(checkbox => {
             const value = parseFloat(checkbox.value);
             // Security: Validate multiplier values
             if (!isNaN(value) && value >= 0.5 && value <= 2.0) {
                 workTimes.push(value);
+                selectedTimeIds.push(checkbox.id);
             }
         });
         
@@ -115,7 +117,17 @@ function initializeApp() {
         
         // Create share message
         const shareMessage = `I just estimated my London Uber driver earnings: £${netWeeklyRounded}/week after costs. Try it yourself: [link]`;
-        const shareUrl = window.location.href;
+        
+        // Build shareable URL with query parameters so results can be revisited
+        const baseUrl = window.location.origin + window.location.pathname;
+        const urlParams = new URLSearchParams();
+        urlParams.set('hours', hours.toString());
+        urlParams.set('weekend', weekendWork ? 'yes' : 'no');
+        urlParams.set('car', carCategory);
+        if (selectedTimeIds.length > 0) {
+            urlParams.set('times', selectedTimeIds.join(','));
+        }
+        const shareUrl = `${baseUrl}?${urlParams.toString()}`;
         
         // Display results
         resultArea.innerHTML = `
@@ -230,6 +242,53 @@ function initializeApp() {
         };
         return links[category] || '';
     }
+    
+    // Initialize from URL parameters (for shared result links)
+    function initializeFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        
+        const hoursParam = params.get('hours');
+        const weekendParam = params.get('weekend');
+        const carParam = params.get('car');
+        const timesParam = params.get('times');
+        
+        // Require minimum data to auto-calculate
+        if (!hoursParam || !weekendParam || !carParam) {
+            return;
+        }
+        
+        // Set hours
+        hoursSlider.value = hoursParam;
+        hoursValue.textContent = `${hoursParam} hours`;
+        
+        // Set weekend radio
+        const weekendInput = document.querySelector(`input[name="weekend"][value="${weekendParam}"]`);
+        if (weekendInput) {
+            weekendInput.checked = true;
+        }
+        
+        // Set car category
+        const carInput = document.querySelector(`input[name="carCategory"][value="${carParam}"]`);
+        if (carInput) {
+            carInput.checked = true;
+        }
+        
+        // Set work time checkboxes
+        if (timesParam) {
+            timesParam.split(',').forEach(id => {
+                const cb = document.getElementById(id);
+                if (cb) {
+                    cb.checked = true;
+                }
+            });
+        }
+        
+        // Finally, calculate using these values
+        calculateEarnings();
+    }
+    
+    // If URL contains shared parameters, auto-load results
+    initializeFromUrl();
 }
 
 // Share functions
