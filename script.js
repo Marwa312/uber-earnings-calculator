@@ -285,7 +285,7 @@ function displayResults(
         <div style="background: #f8f9fa; padding: 18px; border-radius: 10px; margin-bottom: 12px;">
             <div style="color: #000; font-weight: 600; margin-bottom: 8px;">Weekly Costs</div>
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
-                <span style="color: #6c757d; font-size: 0.9rem;">Vehicle with insurance ${getCarLink(carCategory)}</span>
+                <span style="color: #6c757d; font-size: 0.9rem;">Vehicle rental (inc. insurance) ${getCarLink(carCategory)}</span>
                 <span style="color: #6c757d; font-size: 0.9rem; font-weight: 600;">£${vehicleCost}</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;">
